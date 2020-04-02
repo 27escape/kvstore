@@ -1,0 +1,19 @@
+{
+  "name": "kv",
+  "version": "0.0.1",
+  "description": "Simple Key-Value store with namespaces for simple apps to use",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kevin Mulholland",
+  "license": "MIT",
+  "bin": {
+    "kv": "bin/kv"
+  },
+  "dependencies": {
+    "chalk": "^4.0.0",
+    "commander": "^5.0.0",
+    "debug": "^4.1.1",
+    "shelljs": "^0.8.3"
+  }
+}

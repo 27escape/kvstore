@@ -1,0 +1,146 @@
+#!/usr/bin/env node
+// this is overly verbose to help things along
+// -----------------------------------------------------------------------------
+/**
+ * @name    kv
+ * @description Simple Key-Value store with namespaces for simple apps to use
+ * @author  Kevin Mulholland
+ * @licence MIT
+ * @version 0.0.1
+ */
+// -----------------------------------------------------------------------------
+
+// make sure we are checking for basic coding errors
+'use strict';
+'use esversion: 6';
+
+// -----------------------------------------------------------------------------
+const path = require('path');
+const PROGRAM = path.basename(process.argv[1]).replace(/\.js$/, '');
+const VERSION = '0.0.1';
+
+
+const program = require("commander") ;
+const chalk = require("chalk") ;
+const shell = require("shelljs");
+
+const debug = require('debug')(PROGRAM);
+const verbose = require('debug');
+
+// const CONFIG_DIR = path.join(process.env.HOME, `.${PROGRAM}`);
+
+// make some things easy to use
+const log = console.log;
+const error = console.error;
+
+// Do you ever need to sleep within an async function?
+// await new Promise(r => setTimeout(r, 2000));
+
+// -----------------------------------------------------------------------------
+
+// you need this to cleanly catch CTRL+C and nicely exit
+process.once('SIGINT', function (code) {
+  tidyExit(2, 'SIGINT received...');
+});
+
+// -----------------------------------------------------------------------------
+// run this function either when you exit or if called by SIGINT etc
+function tidyExit (lvl, msg) {
+  // do system cleanup actions
+
+  if (lvl) {
+    msg && console.error(msg);
+    process.exit(lvl);
+  }
+}
+// this happens for a normal nice exit
+process.on('beforeExit', (code) => {
+  console.log('Process beforeExit event with code: ', code);
+});
+// this happens if you call process.exit with a non-zero code
+// its not possible to call async functions (or promises) now
+process.on('exit', (code) => {
+  console.log(`About to exit with code: `);
+});
+
+//-----------------------------------------------------------------------------
+// show how to validate command line arguments
+// returns the value
+function _validate_size(pizzasize, default_value) {
+    // pizzasize = pizzasize || 'medium';
+    var size = /^(large|medium|small)$/i;
+    if (!size.test(pizzasize)) {
+        error("its a trap invalid size " + pizzasize + ', using the default of ' + default_value);
+        pizzasize = default_value;
+    }
+
+    return pizzasize.toLowerCase();
+}
+
+//-----------------------------------------------------------------------------
+// we have a main function as an async function, so that we can await for activities in it!
+
+async function main() {
+    // get the passed arguments, help provided by default
+
+    program
+        .description(`${PROGRAM}: Simple Key-Value store with namespaces for simple apps to use`)
+        .version(VERSION, '--version')
+        // .usage("shorter purpose description")
+        .usage('[options] __other commandline parameters__')
+          .option('-v, --verbose', 'enable verbose debug', function () { verbose.enable('*'); })
+        .option('-i, --integer <n>', 'An integer argument', parseInt)
+        .option('-f, --float <n>', 'An integer argument', parseFloat)
+        .option('-o, --optional [value]', 'An optional value')
+        .option("--string", "string input, no default")
+        .option("--default <value>", "defaultstring input", 'some default')
+        // regexp with a default, if match is not made you will get the default value
+        // <size> is REQUIRED
+        // .option('-s --size <size>', 'Pizza size', /^(large|medium|small)$/i, 'medium')
+        .option('-s --size <size>', 'Pizza size - small, *medium* or large', _validate_size, 'medium')
+        // regexp on its own
+        // [drink] is optional
+        .option('-d --drink [drink]', 'Drink', /^(coke|pepsi|izze)$/i)
+        // note that this does not remove things from process.argv
+        .parse(process.argv);
+
+    // assuming we want some extra arguments to be passed
+    if (!program.args || !program.args.length) {
+        program.help();
+    }
+
+    // log(' size: %j', program.size);
+    // log(' drink: %j', program.drink);
+    // log(' default: %j', program.default);
+    // log(' optional: %j', program.optional);
+    // log(' string: %j', program.string);
+    // log(' integer: %j', program.integer);
+    // log(' float: %j', program.float);
+
+    // log('any other things left on the command line ...');
+    // this is an array of items
+    // log(program.args);
+
+    log("Things going well so far");
+    debug( "started");
+
+    // lets do some shell things
+    // shell.cd("/tmp");
+    // const newdir = "newdir." + process.pid;
+    // shell.mkdir(newdir);
+    // view all the mardownfiles
+    // const md = shell.cat("somefiles*.md")
+    // copy some files
+    // shell.cp("/tmp/*md", newdir);
+}
+
+// -----------------------------------------------------------------------------
+// now we start the main activity and catch any errors
+main().then(() => {
+    // stuff todo after main completes, probably may not use this
+    tidyExit(0);
+})
+  .catch(err => {
+    log("there was an error");
+    tidyExit(1, err) ;
+  });

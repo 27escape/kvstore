@@ -69,6 +69,10 @@ process.on('exit', (code) => {
   // console.log('About to exit with code: ', code);
 });
 
+function trimStr (str) {
+  return str.trim();
+}
+
 // -----------------------------------------------------------------------------
 // we have a main function as an async function, so that we can await for activities in it!
 
@@ -79,7 +83,7 @@ async function main () {
     .version(VERSION, '--version')
     .option('-v, --verbose', 'enable verbose debug', () => { verbose.enable('*'); })
     // .option('--default <value>', 'defaultstring input', 'some default')
-    .option('-n, --ns <value>', 'Namespace to use');
+    .option('-n, --ns <value>', 'Namespace to use', trimStr);
 
   if (!shell.test('-f', STORE_FILE)) {
     debug('creating the KV store file');
@@ -104,6 +108,8 @@ async function main () {
   program.command('add <key> <value>')
     .description('add a new key/value pair')
     .action((key, value) => {
+      key = key.trim();
+      value = value.trim();
       if (!program.ns) {
         error('Error: ns field must be specified');
         program.help();
@@ -133,6 +139,7 @@ async function main () {
     .alias('del')
     .alias('rm')
     .action((key) => {
+      key = key.trim();
       if (!program.ns) {
         error('Error: ns field must be specified');
         program.help();
@@ -165,6 +172,7 @@ async function main () {
         error('Error: ns field must be specified');
         program.help();
       }
+      key = key.trim();
       if (!key) {
         error('Error: key field must be specified');
         program.help();
@@ -186,6 +194,7 @@ async function main () {
   program.command('like <regexp>')
     .description('Find all matching keys that are like the passed key regexp')
     .action((regexp) => {
+      regexp = regexp.trim();
       if (!program.ns) {
         error('Error: ns field must be specified');
         program.help();

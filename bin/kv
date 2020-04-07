@@ -169,8 +169,42 @@ async function main () {
         error('Error: key field must be specified');
         program.help();
       }
-        const value = store.get(`store.namespaces.${program.ns}.${key}`);
+      const value = store.get(`store.namespaces.${program.ns}.${key}`);
+      if (typeof value !== 'undefined') {
         console.log(value);
+      }
+    })
+    .on('--help', () => {
+      console.log(`
+  Example:
+
+    kv --ns test get key
+ `);
+    })
+  ;
+
+  program.command('like <regexp>')
+    .description('Find all matching keys that are like the passed key regexp')
+    .action((regexp) => {
+      if (!program.ns) {
+        error('Error: ns field must be specified');
+        program.help();
+      }
+      if (!regexp) {
+        error('Error: key field must be specified');
+        program.help();
+      }
+      try {
+        const re = new RegExp(regexp, 'i');
+        const list = store.get(`store.namespaces.${program.ns}`);
+        Object.keys(list).sort().forEach((key) => {
+          if (key.match(re)) {
+            console.log(`${key}\t\t${list[key]}`);
+          }
+        });
+      } catch {
+        console.log(`Nothing found for namespace ${program.ns}`);
+      }
     })
     .on('--help', () => {
       console.log(`
@@ -191,11 +225,11 @@ async function main () {
       }
       try {
         const list = store.get(`store.namespaces.${program.ns}`);
-        Object.keys(list).forEach((key) => {
+        Object.keys(list).sort().forEach((key) => {
           console.log(`${key}\t\t${list[key]}`);
         });
       } catch {
-        console.log(`store.namespaces.${program.ns}`, list);
+        console.log(`Nothing found for namespace ${program.ns}`);
       }
       completed = true;
     })

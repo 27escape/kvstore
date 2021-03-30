@@ -1,19 +1,39 @@
 {
-  "name": "kv",
-  "version": "0.0.1",
+  "name": "kvstore",
+  "version": "0.3.0",
   "description": "Simple Key-Value store with namespaces for simple apps to use",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "lint": "semistandard --verbose | snazzy",
+    "tidy": "semistandard --fix",
+    "generate-docs": "jsdoc --readme README.md -c jsdoc_conf.json",
+    "jsdocs": "jsdoc --readme README.md  -c jsdoc_conf.json"
   },
   "author": "Kevin Mulholland",
   "license": "MIT",
   "bin": {
     "kv": "bin/kv"
   },
+  "main": "lib/kvstore.js",
   "dependencies": {
     "commander": "^5.0.0",
     "debug": "^4.1.1",
     "dot-json": "^1.2.0",
+    "flat": "^5.0.2",
+    "hash-sum": "^2.0.0",
+    "jsdoc": "^3.6.6",
+    "lockfile": "^1.0.4",
+    "semistandard": "^16.0.0",
     "shelljs": "^0.8.3"
+  },
+  "devDependencies": {
+    "snazzy": "^9.0.0",
+    "sprintf-js": "^1.1.2",
+    "jest": "^25.4.0"
+  },
+  "semistandard": {
+    "ignore": [
+      "*test.js"
+    ]
   }
 }

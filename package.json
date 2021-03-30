@@ -10,7 +10,7 @@
     "jsdocs": "jsdoc --readme README.md  -c jsdoc_conf.json"
   },
   "author": "Kevin Mulholland",
-  "license": "MIT",
+  "license": "ISC",
   "bin": {
     "kv": "bin/kv"
   },
@@ -27,9 +27,9 @@
     "shelljs": "^0.8.3"
   },
   "devDependencies": {
+    "jest": "^25.4.0",
     "snazzy": "^9.0.0",
-    "sprintf-js": "^1.1.2",
-    "jest": "^25.4.0"
+    "sprintf-js": "^1.1.2"
   },
   "semistandard": {
     "ignore": [

@@ -111,6 +111,7 @@ function trimStr (str) {
 
 async function main () {
   program
+    .storeOptionsAsProperties()
     .description(`${PROGRAM}: Simple Key-Value store with namespaces for simple apps to use`)
     .version(VERSION, '--version')
     .option('-v, --verbose', 'enable verbose debug', function () { verbose.enable('*'); })

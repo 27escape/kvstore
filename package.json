@@ -17,17 +17,17 @@
   "main": "lib/kvstore.js",
   "dependencies": {
     "commander": "^8.1.0",
-    "debug": "^4.1.1",
-    "dot-json": "^1.2.0",
+    "debug": "^4.3.2",
+    "dot-json": "^1.2.2",
     "flat": "^5.0.2",
     "hash-sum": "^2.0.0",
-    "jsdoc": "^3.6.6",
+    "jsdoc": "^3.6.7",
     "lockfile": "^1.0.4",
-    "semistandard": "^16.0.0",
-    "shelljs": "^0.8.3"
+    "semistandard": "^16.0.1",
+    "shelljs": "^0.8.4"
   },
   "devDependencies": {
-    "jest": "^25.4.0",
+    "jest": "^27.0.6",
     "snazzy": "^9.0.0",
     "sprintf-js": "^1.1.2"
   },

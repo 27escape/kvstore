@@ -16,7 +16,7 @@
   },
   "main": "lib/kvstore.js",
   "dependencies": {
-    "commander": "^8.1.0",
+    "commander": "^8.3.0",
     "debug": "^4.3.2",
     "dot-json": "^1.2.2",
     "flat": "^5.0.2",
@@ -27,7 +27,7 @@
     "shelljs": "^0.8.4"
   },
   "devDependencies": {
-    "jest": "^27.0.6",
+    "jest": "^27.3.1",
     "snazzy": "^9.0.0",
     "sprintf-js": "^1.1.2",
     "path-parse": ">=1.0.7"

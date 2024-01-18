@@ -21,16 +21,17 @@
     "dot-json": "^1.2.2",
     "flat": "^5.0.2",
     "hash-sum": "^2.0.0",
-    "jsdoc": "^3.6.7",
+    "jsdoc": "^4.0.2",
     "lockfile": "^1.0.4",
-    "semistandard": "^16.0.1",
     "shelljs": "^0.8.4"
   },
   "devDependencies": {
     "jest": "^27.3.1",
+    "path-parse": ">=1.0.7",
+    "semistandard": "^16.0.1",
     "snazzy": "^9.0.0",
     "sprintf-js": "^1.1.2",
-    "path-parse": ">=1.0.7"
+    "tidy-jsdoc": "^1.4.1"
   },
   "semistandard": {
     "ignore": [

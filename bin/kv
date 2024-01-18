@@ -22,10 +22,11 @@ const PROGRAM = path.basename(process.argv[1]).replace(/\.js$/, '');
 
 const pj = require('../package.json');
 const VERSION = pj.version || 'unknown';
-const STORE_FILE = process.env.KV_STORE_FILE || path.join(os.homedir(), '.kvstore.json');
+const DEFAULT_STORE = path.join(os.homedir(), 'Repos', 'personal', 'dotfiles', 'kvstores', 'generalstore.json');
+const STORE_FILE = process.env.KV_STORE_FILE || DEFAULT_STORE;
 const program = require('commander');
 
-// const debug = require('debug')(PROGRAM);
+const debug = require('debug')(PROGRAM);
 const verbose = require('debug');
 const sprintf = require('sprintf-js').sprintf;
 
@@ -74,14 +75,17 @@ process.on('exit', (code) => {
    * @function     showKeyValue
    * @param      {string}  key     The key
    * @param      {object}  value   The value, a string or object
+   * @param      {string}  separator   The string to separate keys and values
    */
-function showKeyValue (key, value) {
+function showKeyValue (key, value, separator) {
   let str;
+  separator ||= ':' ;
   if (value !== undefined) {
     if (typeof (value) === 'object') {
-      str = sprintf('%-20s: %s', `${key}:`, JSON.stringify(value, null, 2));
+      // separator for objects is ALWAYS ':'
+      str = sprintf('%-21s %s', `${key}:`, JSON.stringify(value, null, 2));
     } else {
-      str = sprintf('%-20s %s', `${key}:`, value);
+      str = sprintf('%-21s %s', `${key}${separator}`, value);
     }
   }
   log(str);
@@ -117,6 +121,7 @@ async function main () {
     .option('-v, --verbose', 'enable verbose debug', function () { verbose.enable('*'); })
     .requiredOption('-f, --file <filename>', 'KV store file to use, export KV_STORE_FILE to skip passing this parameter', STORE_FILE)
     .option('-n, --ns <value>', 'Namespace to use', trimStr)
+    .option('-s --separator <value>', 'key and value field separator', ':')
     .option('-e, --echo', 'echo stored value where applicable');
 
   // get the passed arguments, help provided by default
@@ -410,7 +415,7 @@ async function main () {
       Object.keys(matches).forEach((key) => {
         // there is only one subkey for the found item
         Object.keys(matches[key]).forEach((subkey) => {
-          showKeyValue(subkey, matches[key][subkey]);
+          showKeyValue(subkey, matches[key][subkey], program.separator);
         });
       });
     })
@@ -435,7 +440,7 @@ async function main () {
       const found = kv.list();
       found.forEach((ele) => {
         Object.keys(ele).sort().forEach((key) => {
-          showKeyValue(key, ele[key]);
+          showKeyValue(key, ele[key], program.separator);
         });
       });
     })

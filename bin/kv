@@ -115,7 +115,6 @@ function trimStr (str) {
 
 async function main () {
   program
-    .storeOptionsAsProperties()
     .description(`${PROGRAM}: Simple Key-Value store with namespaces for simple apps to use`)
     .version(VERSION, '--version')
     .option('-v, --verbose', 'enable verbose debug', function () { verbose.enable('*'); })
@@ -124,20 +123,22 @@ async function main () {
     .option('-s --separator <value>', 'key and value field separator', ':')
     .option('-e, --echo', 'echo stored value where applicable');
 
+    const options = program.opts();
+
   // get the passed arguments, help provided by default
 
   program.command('put <key> <value>')
     .alias('add')
     .description('put a new key/value pair, overwrites any existing value for that key')
     .action((key, value) => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
 
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       const retval = kv.put(key, value);
-      if (program.echo) {
+      if (options.echo) {
         showValue(retval);
       }
     })
@@ -153,7 +154,7 @@ async function main () {
   program.command('get <key>')
     .description('Get the value for the passed key')
     .action((key) => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
@@ -164,7 +165,7 @@ async function main () {
         program.help();
       }
 
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       showValue(kv.get(key));
     })
     .on('--help', () => {
@@ -181,7 +182,7 @@ async function main () {
     .alias('del')
     .alias('rm')
     .action((key) => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
@@ -190,9 +191,9 @@ async function main () {
         error('Error: key field must be specified');
         program.help();
       }
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       const retval = kv.delete(key);
-      if (program.echo) {
+      if (options.echo) {
         showValue(retval);
       }
     })
@@ -210,7 +211,7 @@ async function main () {
     .action((key, value) => {
       key = key.trim();
       value = value ? value.trim() : 1;
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
@@ -219,9 +220,9 @@ async function main () {
         error('Error: key field must be specified, as must a value');
         program.help();
       }
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       const retval = kv.incr(key, value);
-      if (program.echo) {
+      if (options.echo) {
         showValue(retval);
       }
     })
@@ -239,7 +240,7 @@ async function main () {
     .action((key, value) => {
       key = key.trim();
       value = value ? value.trim() : 1;
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
@@ -248,9 +249,9 @@ async function main () {
         error('Error: key field must be specified, as must a value');
         program.help();
       }
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       const retval = kv.decr(key, value);
-      if (program.echo) {
+      if (options.echo) {
         showValue(retval);
       }
     })
@@ -267,12 +268,12 @@ async function main () {
     .alias('enqueue')
     .description('push a value onto the END of the array/queue indexed by key')
     .action((key, value) => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
 
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       kv.push(key, value);
     })
     .on('--help', () => {
@@ -287,12 +288,12 @@ async function main () {
   program.command('pop <key>')
     .description('pop a value from the END of the array indexed by key')
     .action((key, value) => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
 
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       const retval = kv.pop(key, value);
       showValue(retval);
     })
@@ -308,12 +309,12 @@ async function main () {
   program.command('unshift <key> <value>')
     .description('unshift a value onto the START of the array indexed by key')
     .action((key, value) => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
 
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       kv.unshift(key, value);
     })
     .on('--help', () => {
@@ -329,12 +330,12 @@ async function main () {
     .alias('dequeue')
     .description('shift a value from the START of the array/queue indexed by key')
     .action((key, value) => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
 
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       const retval = kv.shift(key, value);
       showValue(retval);
     })
@@ -350,12 +351,12 @@ async function main () {
   program.command('peek <key>')
     .description('look at the value at the START of the array/queue indexed by key, DOES NOT REMOVE IT')
     .action((key, value) => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
 
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       let retval = kv.get(key, value);
       if (Array.isArray(retval)) {
         retval = retval[0];
@@ -374,12 +375,12 @@ async function main () {
   program.command('length <key>')
     .description('get the length of the array/queue indexed by key')
     .action((key, value) => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
 
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       let retval = kv.get(key, value);
       if (Array.isArray(retval)) {
         retval = retval.length();
@@ -402,7 +403,7 @@ async function main () {
     .description('Find all matching keys that are like the passed key regexp')
     .action((regexp) => {
       regexp = regexp.trim();
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
@@ -410,12 +411,12 @@ async function main () {
         error('Error: key field must be specified');
         program.help();
       }
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       const matches = kv.find(regexp);
       Object.keys(matches).forEach((key) => {
         // there is only one subkey for the found item
         Object.keys(matches[key]).forEach((subkey) => {
-          showKeyValue(subkey, matches[key][subkey], program.separator);
+          showKeyValue(subkey, matches[key][subkey], options.separator);
         });
       });
     })
@@ -432,15 +433,15 @@ async function main () {
     .alias('ls')
     .description('list everything associated with the namespace')
     .action(() => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       const found = kv.list();
       found.forEach((ele) => {
         Object.keys(ele).sort().forEach((key) => {
-          showKeyValue(key, ele[key], program.separator);
+          showKeyValue(key, ele[key], options.separator);
         });
       });
     })
@@ -456,11 +457,11 @@ async function main () {
   program.command('keys')
     .description('list just the top level keys associated with the namespace')
     .action(() => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       log(kv.keys().join('\n'));
     })
     .on('--help', () => {
@@ -475,11 +476,11 @@ async function main () {
   program.command('values')
     .description('list just the top level values associated with the namespace')
     .action(() => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       log(kv.values().join('\n'));
     })
     .on('--help', () => {
@@ -494,11 +495,11 @@ async function main () {
   program.command('spaced')
     .description('list just the top level keys associated with the namespace, space separated')
     .action(() => {
-      if (!program.ns) {
+      if (!options.ns) {
         error('Error: ns field must be specified');
         program.help();
       }
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       log(kv.keys().join(' '));
     })
     .on('--help', () => {
@@ -514,7 +515,7 @@ async function main () {
     .alias('dump')
     .description('dump the namespace data')
     .action(() => {
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       log(JSON.stringify(kv.export(), null, 2));
     })
     .on('--help', () => {
@@ -529,7 +530,7 @@ async function main () {
   program.command('info')
     .description('get info about the store, nothing about the namespaces')
     .action(() => {
-      const kv = new KVStore({ filename: program.file, namespace: program.ns });
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
       log(JSON.stringify(kv.info(), null, 2));
     })
     .on('--help', () => {

@@ -1,3 +1,16 @@
+## 1.0.0 (2024-01-23)
+
+* 1.0.0 ([cd7274f](https://github.com/27escape/kvstore/commit/cd7274f))
+* feat: provide new command to limit the size of an array ([56e89d5](https://github.com/27escape/kvstore/commit/56e89d5))
+
+
+
+## <small>0.5.1 (2024-01-23)</small>
+
+* release: updating changelogs for 0.5.1 ([5e0b374](https://github.com/27escape/kvstore/commit/5e0b374))
+
+
+
 ## <small>0.5.1 (2024-01-23)</small>
 
 * 0.5.1 ([30421a6](https://github.com/27escape/kvstore/commit/30421a6))

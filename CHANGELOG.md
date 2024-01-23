@@ -1,3 +1,16 @@
+# [1.0.0](https://github.com/27escape/kvstore/compare/0.5.1...v1.0.0) (2024-01-23)
+
+
+### Features
+
+* provide new command to limit the size of an array ([56e89d5](https://github.com/27escape/kvstore/commit/56e89d56fd02de4940840cb3a91b4335c68ebd90))
+
+
+
+## [0.5.1](https://github.com/27escape/kvstore/compare/v0.5.1...0.5.1) (2024-01-23)
+
+
+
 ## [0.5.1](https://github.com/27escape/kvstore/compare/v0.5.0...v0.5.1) (2024-01-23)
 
 

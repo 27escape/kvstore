@@ -372,6 +372,52 @@ async function main () {
     })
   ;
 
+  program.command('limithead <key> <count>')
+    .description('limit the size of an array to ONLY count elements, start at the HEAD of the array')
+    .action((key, count) => {
+      if (!options.ns) {
+        error('Error: ns field must be specified');
+        program.help();
+      }
+      console.log( 'count is', count)
+      if( count <= 0) {
+        error('Error: count field cannot be 0 or less');
+        program.help();
+      }
+
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
+      kv.limit(key, 'head', count);
+    })
+    .on('--help', () => {
+      log(`
+  Example:
+
+    kv --ns test limithead key 4
+ `);
+    })
+  ;
+
+  program.command('limittail <key> <count>')
+    .description('limit the size of an array to ONLY count elements, start at the TAIL of the array')
+    .action((key, value) => {
+      if (!options.ns) {
+        error('Error: ns field must be specified');
+        program.help();
+      }
+
+      const kv = new KVStore({ filename: options.file, namespace: options.ns });
+      kv.limit(key, 'tail', count);
+    })
+    .on('--help', () => {
+      log(`
+  Example:
+
+    kv --ns test limittail key 2
+ `);
+    })
+  ;
+
+
   program.command('length <key>')
     .description('get the length of the array/queue indexed by key')
     .action((key, value) => {

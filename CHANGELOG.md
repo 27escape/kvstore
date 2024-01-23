@@ -1,3 +1,7 @@
+## [0.5.1](https://github.com/27escape/kvstore/compare/v0.5.0...v0.5.1) (2024-01-23)
+
+
+
 # [0.5.0](https://github.com/27escape/kvstore/compare/0.5.0...v0.5.0) (2024-01-22)
 
 

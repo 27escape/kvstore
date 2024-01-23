@@ -1,3 +1,11 @@
+## <small>0.5.1 (2024-01-23)</small>
+
+* 0.5.1 ([30421a6](https://github.com/27escape/kvstore/commit/30421a6))
+* release: updating changelogs for 0.5.0 ([054dab0](https://github.com/27escape/kvstore/commit/054dab0))
+* build: Updating for commitizen ([f6f7b11](https://github.com/27escape/kvstore/commit/f6f7b11))
+
+
+
 ## 0.5.0 (2024-01-22)
 
 * 0.5.0 ([8fecf43](https://github.com/27escape/kvstore/commit/8fecf43))

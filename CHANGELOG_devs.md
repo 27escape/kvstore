@@ -1,3 +1,16 @@
+## <small>1.0.1 (2024-01-23)</small>
+
+* 1.0.1 ([7e78d95](https://github.com/27escape/kvstore/commit/7e78d95))
+* docs: add revised help for cli app ([11a9d92](https://github.com/27escape/kvstore/commit/11a9d92))
+
+
+
+## 1.0.0 (2024-01-23)
+
+* release: updating changelogs for 1.0.0 ([4d1cac5](https://github.com/27escape/kvstore/commit/4d1cac5))
+
+
+
 ## 1.0.0 (2024-01-23)
 
 * 1.0.0 ([cd7274f](https://github.com/27escape/kvstore/commit/cd7274f))

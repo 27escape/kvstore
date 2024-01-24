@@ -379,7 +379,6 @@ async function main () {
         error('Error: ns field must be specified');
         program.help();
       }
-      console.log( 'count is', count)
       if( count <= 0) {
         error('Error: count field cannot be 0 or less');
         program.help();
@@ -399,9 +398,13 @@ async function main () {
 
   program.command('limittail <key> <count>')
     .description('limit the size of an array to ONLY count elements, start at the TAIL of the array')
-    .action((key, value) => {
+    .action((key, count) => {
       if (!options.ns) {
         error('Error: ns field must be specified');
+        program.help();
+      }
+      if( count <= 0) {
+        error('Error: count field cannot be 0 or less');
         program.help();
       }
 

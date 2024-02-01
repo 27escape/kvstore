@@ -1,3 +1,21 @@
+# [1.1.0](https://github.com/27escape/kvstore/compare/1.0.1...v1.1.0) (2024-02-01)
+
+
+### Bug Fixes
+
+* ensure that kv limittail does not allow -ve numbers ([55ceb8c](https://github.com/27escape/kvstore/commit/55ceb8c0b578be97f2f4b00b94ac0dc74b1fe72b))
+
+
+### Features
+
+* new command "endpeek" to view last element in an array ([b256e18](https://github.com/27escape/kvstore/commit/b256e18b3f9ce869e85712d5b8ef7d708ccc6fb8))
+
+
+
+## [1.0.1](https://github.com/27escape/kvstore/compare/v1.0.1...1.0.1) (2024-01-23)
+
+
+
 ## [1.0.1](https://github.com/27escape/kvstore/compare/1.0.0...v1.0.1) (2024-01-23)
 
 

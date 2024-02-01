@@ -51,6 +51,8 @@ Commands:
                               indexed by key
   peek <key>                  look at the value at the START of the array/queue
                               indexed by key, DOES NOT REMOVE IT
+  endpeek <key>               look at the value at the END of the array/queue
+                              indexed by key, DOES NOT REMOVE IT
   limithead <key> <count>     limit the size of an array to ONLY count
                               elements, start at the HEAD of the array
   limittail <key> <count>     limit the size of an array to ONLY count
@@ -69,6 +71,7 @@ Commands:
   info                        get info about the store, nothing about the
                               namespaces
   help [command]              display help for command
+
 
 ```
 

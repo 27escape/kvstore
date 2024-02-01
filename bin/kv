@@ -367,10 +367,34 @@ async function main () {
       log(`
   Example:
 
-    kv --ns test shift key
+    kv --ns test peek array
  `);
     })
   ;
+
+  program.command('endpeek <key>')
+  .description('look at the value at the END of the array/queue indexed by key, DOES NOT REMOVE IT')
+  .action((key, value) => {
+    if (!options.ns) {
+      error('Error: ns field must be specified');
+      program.help();
+    }
+
+    const kv = new KVStore({ filename: options.file, namespace: options.ns });
+    let retval = kv.get(key, value);
+    if (Array.isArray(retval)) {
+      retval = retval[retval.length -1];
+    }
+    showValue(retval);
+  })
+  .on('--help', () => {
+    log(`
+Example:
+
+  kv --ns test unpeak array
+`);
+  })
+;
 
   program.command('limithead <key> <count>')
     .description('limit the size of an array to ONLY count elements, start at the HEAD of the array')

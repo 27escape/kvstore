@@ -1,3 +1,16 @@
+## <small>1.1.1 (2024-02-01)</small>
+
+* 1.1.1 ([748ea83](https://github.com/27escape/kvstore/commit/748ea83))
+* docs: update CLI help with endpeek command ([0367c17](https://github.com/27escape/kvstore/commit/0367c17))
+
+
+
+## 1.1.0 (2024-02-01)
+
+* release: updating changelogs for 1.1.0 ([1575a09](https://github.com/27escape/kvstore/commit/1575a09))
+
+
+
 ## 1.1.0 (2024-02-01)
 
 * 1.1.0 ([8bec29b](https://github.com/27escape/kvstore/commit/8bec29b))

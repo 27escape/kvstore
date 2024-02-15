@@ -64,7 +64,16 @@ Options:
     kv --ns test add key 'test string'
 ```
 
-### 
+### basic KV operations
+
+* get
+* put/add
+* delete/del/remove/rm
+
+### operations on numbers
+
+* incr
+* dec
 
 ### Use as a simple queueing system
 
@@ -83,3 +92,14 @@ There are aliases for some commands that allow KV to be used as a queueing syste
 * endpeek
 * limithead
 * limitatail
+
+
+### information operations
+
+* find
+* list
+* keys
+* values
+* spaced
+* export/dump
+* info

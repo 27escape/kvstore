@@ -16,7 +16,7 @@
   },
   "main": "lib/kvstore.js",
   "dependencies": {
-    "commander": "^11.1.0",
+    "commander": "^12.0.0",
     "debug": "^4.3.4",
     "dot-json": "^1.3.0",
     "flat": "=5.0.2",

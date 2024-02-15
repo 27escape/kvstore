@@ -50,9 +50,7 @@ Commands:
 More help on specific commands can be found when using help with that command
 
 ```
-
-> kv add -h
-
+$ kv add -h
 
 Usage: kv add [options] <key> <value>
 
@@ -64,15 +62,24 @@ Options:
   Example:
 
     kv --ns test add key 'test string'
-
 ```
+
+### 
 
 ### Use as a simple queueing system
 
 There are aliases for some commands that allow KV to be used as a queueing system. These are
 
-* enqueue - put a value at the tail of the queue
-* dequeue - take a value from the head of the queue
-* peek - view the value at the head of the queue
-* length - get the length of the queue
+* push/enqueue
+* shift/dequeue
+* peek* length - get the length of the queue
 
+
+### Other array operations
+
+* length
+* pop  
+* unshift
+* endpeek
+* limithead
+* limitatail

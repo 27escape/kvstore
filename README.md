@@ -12,7 +12,7 @@ This repo provides both a library for use by nodejs scripts and a CLI (kv) to ei
 
 ## Installing
 
-If you have cloned this repo, then `npm install` should do the trick
+If you have cloned this repo, then `npm install` should do the trick, if you want to use the `kv` script for CLI, then you need to run `npm link`
 
 You may run `npm run test` to make sure everything is working as expected.
 

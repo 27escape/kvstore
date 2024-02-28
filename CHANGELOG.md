@@ -1,3 +1,26 @@
+# [1.2.0](https://github.com/27escape/kvstore/compare/1.1.1...v1.2.0) (2024-02-28)
+
+
+### Bug Fixes
+
+* key and namespaces should allow numbers not pre/postfixed by periods ([e3da9db](https://github.com/27escape/kvstore/commit/e3da9db48b2f1165d482180f99917164927c7786))
+
+
+### Features
+
+* new option clean, to clean key and namespace values before use ([19f7aad](https://github.com/27escape/kvstore/commit/19f7aad5b7d8e7ebb6c817ef7a273112a93c757b))
+
+
+### Reverts
+
+* restore os and path requires ([db3c135](https://github.com/27escape/kvstore/commit/db3c1354e9abac3c68089b225ebd22d8b0d3ebf0))
+
+
+
+## [1.1.1](https://github.com/27escape/kvstore/compare/v1.1.1...1.1.1) (2024-02-01)
+
+
+
 ## [1.1.1](https://github.com/27escape/kvstore/compare/1.1.0...v1.1.1) (2024-02-01)
 
 

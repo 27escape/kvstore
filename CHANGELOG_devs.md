@@ -1,3 +1,26 @@
+## 1.2.0 (2024-02-28)
+
+* 1.2.0 ([f4bf18b](https://github.com/27escape/kvstore/commit/f4bf18b))
+* chore: node package updates ([21044f6](https://github.com/27escape/kvstore/commit/21044f6))
+* chore: remove yarn ([a637041](https://github.com/27escape/kvstore/commit/a637041))
+* chore: update flat module ([66e0eba](https://github.com/27escape/kvstore/commit/66e0eba))
+* fix: key and namespaces should allow numbers not pre/postfixed by periods ([e3da9db](https://github.com/27escape/kvstore/commit/e3da9db))
+* revert: restore os and path requires ([db3c135](https://github.com/27escape/kvstore/commit/db3c135))
+* docs: general improvements and some examples ([a8566c0](https://github.com/27escape/kvstore/commit/a8566c0))
+* docs: more basic info ([f05dc7f](https://github.com/27escape/kvstore/commit/f05dc7f))
+* docs: small improvements ([0e0c0bf](https://github.com/27escape/kvstore/commit/0e0c0bf))
+* refactor: prevent some use of periods/fullstops in namespaces or key values ([07af863](https://github.com/27escape/kvstore/commit/07af863))
+* refactor: tidy code to reduce duplications ([5b580f7](https://github.com/27escape/kvstore/commit/5b580f7))
+* feat: new option clean, to clean key and namespace values before use ([19f7aad](https://github.com/27escape/kvstore/commit/19f7aad))
+
+
+
+## <small>1.1.1 (2024-02-01)</small>
+
+* release: updating changelogs for 1.1.1 ([a83c3f9](https://github.com/27escape/kvstore/commit/a83c3f9))
+
+
+
 ## <small>1.1.1 (2024-02-01)</small>
 
 * 1.1.1 ([748ea83](https://github.com/27escape/kvstore/commit/748ea83))

@@ -19,6 +19,8 @@
 const PROGRAM = 'kv';
 const VERSION = '2.0.0';
 
+const path = require( 'path')
+const os = require( 'os')
 const DEFAULT_STORE = path.join(os.homedir(), '.kvstore.json');
 const STORE_FILE = process.env.KV_STORE_FILE || DEFAULT_STORE;
 const {program} = require('commander');
@@ -34,6 +36,7 @@ const log = console.log;
 const error = console.error;
 
 // -----------------------------------------------------------------------------
+
 
 // you need this to cleanly catch CTRL+C and nicely exit
 process.once('SIGINT', function (code) {

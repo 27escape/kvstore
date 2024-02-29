@@ -23,7 +23,7 @@ const path = require( 'path')
 const os = require( 'os')
 const DEFAULT_STORE = path.join(os.homedir(), '.kvstore.json');
 const STORE_FILE = process.env.KV_STORE_FILE || DEFAULT_STORE;
-const {program} = require('commander');
+const { program } = require('commander');
 
 const debug = require('debug')(PROGRAM);
 const verbose = require('debug');
@@ -131,7 +131,9 @@ async function main () {
     .requiredOption('-f, --file <filename>', 'KV store file to use, export KV_STORE_FILE to skip passing this parameter', STORE_FILE)
     .option('-n, --ns <value>', '(required) namespace to use', trimStr)
     .option('-c --clean', 'tidy/clean key and namespace values before use')
-    .option('-s --separator <value>', 'key and value field separator', ':')
+    .option( '-j, --json', `on input value is a JSON string that will be converted to an object to be stored,
+                            on output an object will be converted into a JSON string`)
+    .option('-s --separator <value>', 'key and value field separator for find, list, spaced commands', ':')
     .option('-e, --echo', 'echo stored value where applicable');
 
     const options = program.opts();

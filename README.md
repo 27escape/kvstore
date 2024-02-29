@@ -1,8 +1,8 @@
 # kv
 
-I initially created this repo to allow CLI apps to access simple key-value stores. It has now grown beyond that.
+I initially created this repo to allow CLI apps to access simple key-value stores. It has now grown beyond that. It now provides access to data within a JSON file, performing basic get/put operations, operations on numbers such as incr and decr, operations on arrays (e.g. push, pop, shift, unshift), as well as providing search functionality.
 
-There are several different modules like this on [NPM](https://www.npmjs.com/search?q=kvstore), this is my effort and helps on my Javascript/NodeJS learning journey. One big differentiator is that it also provides array, increment/decrement and find functions over and above the usual get/set methods normally provided.
+There are several different modules like this on [NPM](https://www.npmjs.com/search?q=kvstore); this is my effort and helps on my Javascript/NodeJS learning journey. One big differentiator is that it also provides array, increment/decrement and find functions over and above the usual get/set methods normally provided.
 
 Updates to the store file happen when any data is added or taken from it, this does mean that it is slower than performing a periodic write, however it does mean that data will not be lost by a crash or application termination.
 
@@ -21,6 +21,7 @@ I have not yet added this to [NPM](https://www.npmjs.com/)
 ## As a library
 
 ```js
+// until I release it to npm, you will have to reference it with a full path
 const KVStore = require('../kvstore/lib/kvstore');
 
 const kv = new KVStore({ filename: '/tmp/kvstore.json', namespace: 'sample' });
@@ -44,7 +45,7 @@ Full documentation for the library can be seen in [[api.md]]
 Basic operations
 
 ```
-# add/put/set
+# put
 $ kv --ns 'namespace' --file /tmp/sample.js put key1 value 
 
 # get

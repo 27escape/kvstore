@@ -139,7 +139,6 @@ async function main () {
   // get the passed arguments, help provided by default
 
   program.command('put <key> <value>')
-    .alias('add')
     .description('put a new key/value pair, overwrites any existing value for that key')
     .action((key, value) => {
       const kv = get_kvstore( program)

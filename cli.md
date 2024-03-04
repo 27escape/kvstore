@@ -7,22 +7,23 @@ To get he
 $ kv
 
 Usage: kv [options] [command]
-Usage: kv [options] [command]
 
 kv: Simple Key-Value store with namespaces for simple apps to use
 
 Options:
   --version                   output the version number
   -v, --verbose               enable verbose debug
-  -f, --file <filename>       KV store file to use, export KV_STORE_FILE to skip passing this parameter (default: "$HOME/.kvstore.json")
+  -f, --file <filename>       KV store file to use, export KV_STORE_FILE to skip passing this parameter (default: "/Users/kevinmu/.kvstore.json")
   -n, --ns <value>            (required) namespace to use
   -c --clean                  tidy/clean key and namespace values before use
-  -s --separator <value>      key and value field separator (default: ":")
+  -j, --json                  on input value is a JSON string that will be converted to an object to be stored, not required for output as this already happens
+                              automatically
+  -s --separator <value>      key and value field separator for find, list, spaced commands (default: ":")
   -e, --echo                  echo stored value where applicable
   -h, --help                  display help for command
 
 Commands:
-  put|add <key> <value>       put a new key/value pair, overwrites any existing value for that key
+  put <key> <value>           put a new key/value pair, overwrites any existing value for that key
   get <key>                   Get the value for the passed key
   delete|del <key>            delete everything associated with the key
   incr <key> [value]          increment the value of a key by a given amount, 1 if missing
@@ -44,7 +45,6 @@ Commands:
   export|dump                 dump the namespace data
   info                        get info about the store, nothing about the namespaces
   help [command]              display help for command
-
 ```
 
 More help on specific commands can be found when using help with that command

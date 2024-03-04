@@ -1,3 +1,16 @@
+# [1.3.0](https://github.com/27escape/kvstore/compare/1.2.0...v1.3.0) (2024-03-04)
+
+
+### Features
+
+* **cli:** allow JSON data to be passed as an input value ([7ae7633](https://github.com/27escape/kvstore/commit/7ae7633656812f900d18179b5fa23f73843b48a6))
+
+
+
+# [1.2.0](https://github.com/27escape/kvstore/compare/v1.2.0...1.2.0) (2024-02-28)
+
+
+
 # [1.2.0](https://github.com/27escape/kvstore/compare/1.1.1...v1.2.0) (2024-02-28)
 
 

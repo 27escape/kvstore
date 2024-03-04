@@ -1,3 +1,19 @@
+## 1.3.0 (2024-03-04)
+
+* --wip-- [skip ci] ([6cba89d](https://github.com/27escape/kvstore/commit/6cba89d))
+* 1.3.0 ([fa11a5a](https://github.com/27escape/kvstore/commit/fa11a5a))
+* remove add alias ([7b1722a](https://github.com/27escape/kvstore/commit/7b1722a))
+* docs: explain a bit more about how it came to be ([3ba0edd](https://github.com/27escape/kvstore/commit/3ba0edd))
+* feat(cli): allow JSON data to be passed as an input value ([7ae7633](https://github.com/27escape/kvstore/commit/7ae7633))
+
+
+
+## 1.2.0 (2024-02-28)
+
+* release: updating changelogs for 1.2.0 ([41e74a2](https://github.com/27escape/kvstore/commit/41e74a2))
+
+
+
 ## 1.2.0 (2024-02-28)
 
 * 1.2.0 ([f4bf18b](https://github.com/27escape/kvstore/commit/f4bf18b))

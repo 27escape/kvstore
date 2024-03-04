@@ -23,7 +23,7 @@ const path = require( 'path')
 const os = require( 'os')
 const DEFAULT_STORE = path.join(os.homedir(), '.kvstore.json');
 const STORE_FILE = process.env.KV_STORE_FILE || DEFAULT_STORE;
-const {program} = require('commander');
+const { program } = require('commander');
 
 const debug = require('debug')(PROGRAM);
 const verbose = require('debug');
@@ -33,7 +33,6 @@ const KVStore = require('../lib/kvstore');
 
 // make some things easy to use
 const log = console.log;
-const error = console.error;
 
 // -----------------------------------------------------------------------------
 
@@ -49,7 +48,7 @@ function tidyExit (lvl, msg) {
   // do system cleanup actions
 
   if (lvl) {
-    msg && error(msg);
+    msg && console.error(msg);
     process.exit(lvl);
   }
 }
@@ -92,7 +91,7 @@ function showKeyValue (key, value, separator) {
    * nicely write out the value.
    *
    * @function     showValue
-   * @param      {object}   value   The value, object or string
+   * @param      {Object}   value   The value, object or string
    */
 function showValue (value) {
   let str = value || '';
@@ -103,21 +102,51 @@ function showValue (value) {
   log(str);
 }
 
-function trimStr (str) {
+/**
+ * trim a string, only needed for Commander inputs
+ * @param {string} str
+ * @returns {string}
+ */
+function _trimStr (str) {
   return str.trim();
 }
 
 // -----------------------------------------------------------------------------
 
+/**
+ * Description
+ * @param {Object} program           the Commander program objecy
+ * @param {boolean} ignore_ns=false  ignore validating namespace
+ * @returns {Object}                  create KV class object
+ */
 function get_kvstore( program, ignore_ns = false) {
   const options = program.opts();
 
   if (!ignore_ns && !options.ns) {
-    error('Error: ns field must be specified');
+    console.error('Error: ns field must be specified');
     program.help();
   }
 
   return new KVStore({ filename: options.file, namespace: options.ns, tidykeys: options.clean });
+}
+
+// -----------------------------------------------------------------------------
+/**
+ * optionally convert a passed string into an object
+ * @param {any} value
+ * @param {boolean} isJSON=false
+ * @returns {any}
+ */
+function fromJSON( value, isJSON=false) {
+  if( isJSON) {
+    try {
+      value = JSON.parse( value)
+    } catch (error) {
+      console.error( 'Error: The passed value does not look like a JSON object')
+    }
+  }
+
+  return value ;
 }
 
 // -----------------------------------------------------------------------------
@@ -129,9 +158,10 @@ async function main () {
     .version(VERSION, '--version')
     .option('-v, --verbose', 'enable verbose debug', function () { verbose.enable('*'); })
     .requiredOption('-f, --file <filename>', 'KV store file to use, export KV_STORE_FILE to skip passing this parameter', STORE_FILE)
-    .option('-n, --ns <value>', '(required) namespace to use', trimStr)
+    .option('-n, --ns <value>', '(required) namespace to use', _trimStr)
     .option('-c --clean', 'tidy/clean key and namespace values before use')
-    .option('-s --separator <value>', 'key and value field separator', ':')
+    .option('-j, --json', `on input value is a JSON string that will be converted to an object to be stored, not required for output as this already happens automatically`)
+    .option('-s --separator <value>', 'key and value field separator for find, list, spaced commands', ':')
     .option('-e, --echo', 'echo stored value where applicable');
 
     const options = program.opts();
@@ -139,11 +169,10 @@ async function main () {
   // get the passed arguments, help provided by default
 
   program.command('put <key> <value>')
-    .alias('add')
     .description('put a new key/value pair, overwrites any existing value for that key')
     .action((key, value) => {
       const kv = get_kvstore( program)
-      const retval = kv.put(key, value);
+      const retval = kv.put(key, fromJSON(value, options.json));
       if (options.echo) {
         showValue(retval);
       }
@@ -162,7 +191,7 @@ async function main () {
     .action((key) => {
       key = key.trim();
       if (!key) {
-        error('Error: key field must be specified');
+        console.error('Error: key field must be specified');
         program.help();
       }
 
@@ -185,7 +214,7 @@ async function main () {
     .action((key) => {
       key = key.trim();
       if (!key) {
-        error('Error: key field must be specified');
+        console.error('Error: key field must be specified');
         program.help();
       }
       const kv = get_kvstore( program)
@@ -210,7 +239,7 @@ async function main () {
       value = value ? value.trim() : 1;
 
       if (!key) {
-        error('Error: key field must be specified, as must a value');
+        console.error('Error: key field must be specified, as must a value');
         program.help();
       }
       const kv = get_kvstore( program)
@@ -235,7 +264,7 @@ async function main () {
       value = value ? value.trim() : 1;
 
       if (!key) {
-        error('Error: key field must be specified, as must a value');
+        console.error('Error: key field must be specified, as must a value');
         program.help();
       }
       const kv = get_kvstore( program)
@@ -258,7 +287,7 @@ async function main () {
     .description('push a value onto the END of the array/queue indexed by key')
     .action((key, value) => {
       const kv = get_kvstore( program)
-      kv.push(key, value);
+      kv.push(key, fromJSON(value, options.json));
     })
     .on('--help', () => {
       log(`
@@ -271,9 +300,9 @@ async function main () {
 
   program.command('pop <key>')
     .description('pop a value from the END of the array indexed by key')
-    .action((key, value) => {
+    .action((key) => {
       const kv = get_kvstore( program)
-      const retval = kv.pop(key, value);
+      const retval = kv.pop(key);
       showValue(retval);
     })
     .on('--help', () => {
@@ -289,7 +318,7 @@ async function main () {
     .description('unshift a value onto the START of the array indexed by key')
     .action((key, value) => {
       const kv = get_kvstore( program)
-      kv.unshift(key, value);
+      kv.unshift(key, fromJSON(value, options.json));
     })
     .on('--help', () => {
       log(`
@@ -359,7 +388,7 @@ Example:
     .description('limit the size of an array to ONLY count elements, start at the HEAD of the array')
     .action((key, count) => {
       if( count <= 0) {
-        error('Error: count field cannot be 0 or less');
+        console.error('Error: count field cannot be 0 or less');
         program.help();
       }
 
@@ -379,7 +408,7 @@ Example:
     .description('limit the size of an array to ONLY count elements, start at the TAIL of the array')
     .action((key, count) => {
       if( count <= 0) {
-        error('Error: count field cannot be 0 or less');
+        console.error('Error: count field cannot be 0 or less');
         program.help();
       }
 
@@ -420,7 +449,7 @@ Example:
     .action((regexp) => {
       regexp = regexp.trim();
       if (!regexp) {
-        error('Error: key field must be specified');
+        console.error('Error: key field must be specified');
         program.help();
       }
       const kv = get_kvstore( program)

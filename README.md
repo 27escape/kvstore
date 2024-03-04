@@ -38,7 +38,7 @@ found.forEach((ele) => {
 });
 ```
 
-Full documentation for the library can be seen in [[api.md]]
+Full documentation for the library can be seen in [API documentation](api.md)
 
 ## As a CLI
 
@@ -55,7 +55,7 @@ $ VALUE=$(kv --ns 'namespace' /tmp/sample.js get key1)
 $ kv --ns 'namespace' /tmp/sample.js delete key1
 ```
 
-For more operations see [[cli.md]] or use the inbuilt help  `kv -h`
+For more operations see [CLI documentation](cli.md) or use the inbuilt help  `kv -h`
 
 
 ## Use with bun

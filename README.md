@@ -12,9 +12,11 @@ This repo provides both a library for use by nodejs scripts and a CLI (kv) to ei
 
 ## Installing
 
-If you have cloned this repo, then `npm install` should do the trick, if you want to use the `kv` script for CLI, then you need to run `npm link`
+This application uses [bun](https://bun.sh/) to manage the modules, run the tests and is also used (on unix like systems) as the executor script for the cli. You will need to install `bun` to proceed, you could also mess about with things and use `nodejs` it would not be too much trouble.
 
-You may run `npm run test` to make sure everything is working as expected.
+If you have cloned this repo, then `bun install` should do the trick, if you want to use the `kv` script for CLI, then you need to run `bun link`
+
+You may run `bun test` to make sure everything is working as expected.
 
 I have not yet added this to [NPM](https://www.npmjs.com/)
 
@@ -57,7 +59,3 @@ $ kv --ns 'namespace' /tmp/sample.js delete key1
 
 For more operations see [CLI documentation](cli.md) or use the inbuilt help  `kv -h`
 
-
-## Use with bun
-
-If you want to make use of this script with [bun](https://bun.sh/) then replace `node` with `bun` in `bin/kv`, you will of course need `bun` to be installed on your system.

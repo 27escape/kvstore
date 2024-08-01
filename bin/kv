@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 // this is overly verbose to help things along
 // -----------------------------------------------------------------------------
 /**
@@ -445,6 +445,7 @@ Example:
 
   program.command('find <regexp>')
     .alias('like')
+    .alias('search')
     .description('Find all matching keys in that are like the passed key regexp')
     .action((regexp) => {
       regexp = regexp.trim();

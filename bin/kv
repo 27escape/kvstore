@@ -31,8 +31,6 @@ const sprintf = require('sprintf-js').sprintf;
 
 const KVStore = require('../lib/kvstore');
 
-// make some things easy to use
-const log = console.log;
 
 // -----------------------------------------------------------------------------
 
@@ -55,14 +53,14 @@ function tidyExit (lvl, msg) {
 // this happens for a normal nice exit
 process.on('beforeExit', (code) => {
   if (code) {
-    log('Process beforeExit event with code: ', code);
+    console.log('Process beforeExit event with code: ', code);
   }
 });
 
 // this happens if you call process.exit with a non-zero code
 // its not possible to call async functions (or promises) now
 process.on('exit', (code) => {
-  // log('About to exit with code: ', code);
+  // console.log('About to exit with code: ', code);
 });
 
 /**
@@ -84,7 +82,7 @@ function showKeyValue (key, value, separator) {
       str = sprintf('%-21s %s', `${key}${separator}`, value);
     }
   }
-  log(str);
+  console.log(str);
 }
 
 /**
@@ -99,7 +97,7 @@ function showValue (value) {
     str = JSON.stringify(value, null, 2);
   }
 
-  log(str);
+  console.log(str);
 }
 
 /**
@@ -178,7 +176,7 @@ async function main () {
       }
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test put key 'test string'
@@ -199,7 +197,7 @@ async function main () {
       showValue(kv.get(key));
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test get key
@@ -224,7 +222,7 @@ async function main () {
       }
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test delete key
@@ -249,7 +247,7 @@ async function main () {
       }
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test incr counter 10
@@ -274,7 +272,7 @@ async function main () {
       }
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test decr counter 10
@@ -290,7 +288,7 @@ async function main () {
       kv.push(key, fromJSON(value, options.json));
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test push key 'test string'
@@ -306,7 +304,7 @@ async function main () {
       showValue(retval);
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test pop key
@@ -321,7 +319,7 @@ async function main () {
       kv.unshift(key, fromJSON(value, options.json));
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test unshift key 'test string'
@@ -338,7 +336,7 @@ async function main () {
       showValue(retval);
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test shift key
@@ -357,7 +355,7 @@ async function main () {
       showValue(retval);
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test peek array
@@ -376,7 +374,7 @@ async function main () {
     showValue(retval);
   })
   .on('--help', () => {
-    log(`
+    console.log(`
 Example:
 
   kv --ns test unpeak array
@@ -396,7 +394,7 @@ Example:
       kv.limit(key, 'head', count);
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test limithead key 4
@@ -416,7 +414,7 @@ Example:
       kv.limit(key, 'tail', count);
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test limittail key 2
@@ -435,7 +433,7 @@ Example:
       showValue(retval);
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test shift key
@@ -462,7 +460,7 @@ Example:
       });
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test find key
@@ -483,7 +481,7 @@ Example:
       });
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test list
@@ -495,10 +493,10 @@ Example:
     .description('list just the top level keys associated with the namespace')
     .action(() => {
       const kv = get_kvstore( program)
-      log(kv.keys().join('\n'));
+      console.log(kv.keys().join('\n'));
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test keys
@@ -510,10 +508,10 @@ Example:
     .description('list just the top level values associated with the namespace')
     .action(() => {
       const kv = get_kvstore( program)
-      log(kv.values().join('\n'));
+      console.log(kv.values().join('\n'));
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test values
@@ -525,10 +523,10 @@ Example:
     .description('list just the top level keys associated with the namespace, space separated')
     .action(() => {
       const kv = get_kvstore( program)
-      log(kv.keys().join(' '));
+      console.log(kv.keys().join(' '));
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv --ns test spaced
@@ -541,10 +539,10 @@ Example:
     .description('dump the namespace data')
     .action(() => {
       const kv = get_kvstore( program)
-      log(JSON.stringify(kv.export(), null, 2));
+      console.log(JSON.stringify(kv.export(), null, 2));
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv export
@@ -556,10 +554,10 @@ Example:
     .description('get info about the store, nothing about the namespaces')
     .action(() => {
       const kv = get_kvstore( program, true)
-      log(JSON.stringify(kv.info(), null, 2));
+      console.log(JSON.stringify(kv.info(), null, 2));
     })
     .on('--help', () => {
-      log(`
+      console.log(`
   Example:
 
     kv dump
@@ -578,6 +576,6 @@ main().then(() => {
   tidyExit(0);
 })
   .catch(err => {
-    // log('there was an error');
+    // console.log('there was an error');
     tidyExit(1, err.message);
   });

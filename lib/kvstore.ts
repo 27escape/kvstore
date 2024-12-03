@@ -13,39 +13,59 @@
 'use esversion: 6';
 
 // version 2 does not include the 'accesses' field in the header
-const KV_VERSION = '2.0.0';
+const KV_VERSION = '2.1.0';
 
-const path = require('path');
+import * as path from 'path'
+import * as fs from 'fs'
+import Debug from 'debug';
+// const LIBNAME = path.basename(import.meta.filename.replace(/\.ts$/, ''));
+const LIBNAME = 'kvstore'
+const debug = Debug(LIBNAME);
 
-const DotJson = require('dot-json');
-const flatten = require('flat');
-const unflatten = require('flat').unflatten;
-const shell = require('shelljs');
-const lockfile = require('lockfile');
+// import {DotJson}  from './dot-json.ts';
+import DotJson from 'dot-json';
+import { flatten, unflatten } from 'flat';
+import * as lockfile from 'lockfile';
 
-const debug = require('debug')(path.basename(__filename, '.js'));
+const NAMESPACES = 'store.namespaces'
 
 // -----------------------------------------------------------------------------
 
-class KVStore {
-  constructor ({ filename, namespace, indent = 2, tidykeys = false }) {
-    this.indent = indent;
-    if (!namespace) {
+export class KVStore {
+  filename: string;
+  indent: Number;
+  namespace: string;
+  store: any;
+  force: boolean;
+  lockFileName: string;
+  tidykeys: boolean;
+
+  constructor(config: { filename: string, namespace: string, indent: number, tidykeys: boolean, force: boolean }) {
+
+    if (config.indent === undefined) {
+      config.indent = 2
+    }
+    this.force = config.force;
+    this.indent = config.indent;
+    if (!config.namespace) {
       debug('Missing namespace, using defaut');
       this.namespace = 'default';
     } else {
-      this.namespace = this._cleanKey( namespace, 'namespace') ;
+      this.namespace = this._cleanKey(config.namespace, 'namespace');
     }
-    this.lockFileName = path.join(`${filename}.lock`);
-    this.filename = filename;
+    this.lockFileName = path.join(`${config.filename}.lock`);
+    this.filename = config.filename;
+    this.tidykeys = config.tidykeys;
+
     try {
       // const fileid = hashsum(filename);
       // this.lockFileName = path.join(os.tmpdir(), `${filename}.${fileid}.lock`);
       // debug(this.lockfileName);
       this._lockFile();
-      this.store = new DotJson(filename, 2); // nicely indent the JSON
 
-      if (!shell.test('-f', filename)) {
+      this.store = new DotJson(this.filename);
+
+      if (!this._isFile(this.filename)) {
         debug('creating the KV store file');
         // create the KV file the first time around
         this.store
@@ -53,12 +73,12 @@ class KVStore {
           .set('store.updates', 0)
           .set('store.last_modified', Date.now())
           .set('store.version', 1)
-          .set('store.namespaces', {})
+          .set(`${NAMESPACES}`, {})
           .save(this.indent);
       }
       const about = this.store.get('store');
       if (!about) {
-        throw new Error(`Error: KV store file ${filename} is invalid`);
+        throw new Error(`Error: KV store file ${this.filename} is invalid`);
       }
       this._unlockFile();
     } catch (err) {
@@ -68,26 +88,59 @@ class KVStore {
     }
   }
 
-  _lockFile () {
-    if (!shell.test('-f', this.lockFileName)) {
+  /**
+   * tests if a file exists
+   *
+   * @method     _isFile
+   */
+  _isFile(filepath: string): boolean {
+    // fs.stat will throw an ENOENT error, if a file you want to test for does not
+    // exist, even before you get to check if it is a file when it does exist
+    let status = false
+    if (filepath) {
+      try {
+        const lf = fs.statSync(filepath)
+        status = lf.isFile()
+      } catch (err: any) {
+        // we are only interested if the file does not exist yet
+        if (err.code !== "ENOENT") {
+          throw err
+        }
+      }
+    }
+
+    return status
+  }
+
+  /**
+   * locks the file
+   *
+   * @method     _lockFile
+   */
+  _lockFile() {
+    if (!this._isFile(this.lockFileName)) {
       lockfile.lockSync(this.lockFileName);
     }
   }
 
   /**
-   * { locks the file }
+   * unlocks the file
    *
    * @method     _unlockFile
    */
-  _unlockFile () {
-    if (this.lockFileName && shell.test('-f', this.lockFileName)) {
-      lockfile.unlockSync(this.lockFileName);
-      shell.rm('-f', this.lockFileName);
+  _unlockFile() {
+    if (this.lockFileName) {
+      try {
+        lockfile.unlockSync(this.lockFileName);
+        fs.unlinkSync(this.lockFileName);
+      } catch (err) {
+        // ignore
+      }
     }
   }
 
   /**
-   * { clean up the key to something acceptable, if constructor option tidykeys is used will replace '.' and spaces with '_' }
+   * clean up the key to something acceptable, if constructor option tidykeys is used will replace '.' and spaces with '_'
    *
    * @method     _cleanKey
    * @param      {string}  key     The key
@@ -95,23 +148,23 @@ class KVStore {
    * @returns    {string}  key     Lower cased clean key
    * @throws {Error}
    */
-  _cleanKey( key, keytype = 'key') {
+  _cleanKey(key: string, keytype: string = 'key'): string {
     if (key) {
       // do we want to allow keys to be cleaned up
-      if( this.tidykeys) {
-        key = key.replace( /\.| /g, '_') // replace periods and spaces
-        key = key.replace( /_+/g, '_')   // remove dups
-        key = key.replace( /^_|_$/g, '') // remove leading or trailing
+      if (this.tidykeys) {
+        key = key.replace(/\.| /g, '_') // replace periods and spaces
+        key = key.replace(/_+/g, '_')   // remove dups
+        key = key.replace(/^_|_$/g, '') // remove leading or trailing
       } else {
-        if( key.match( /^\./)) {
+        if (key.match(/^\./)) {
           throw new Error(`${keytype} cannot start with dot/period`);
         }
         switch (typeof key) {
-          case 'number' :
-          case 'bigint' :
+          case 'number':
+          case 'bigint':
             throw new Error(`Cannot have a number as a ${keytype}`);
             break; // eslint-disable-line
-          case 'string' :
+          case 'string':
             // no isolated numbers
             // cannot start with a number and full stop
             // cannot have fullstops surrounding a number
@@ -125,7 +178,7 @@ class KVStore {
         }
 
         // remove any trailing dots
-        key = key.replace( /\.+$/, '')
+        key = key.replace(/\.+$/, '')
       }
     }
 
@@ -133,7 +186,7 @@ class KVStore {
     return key
   }
 
-  _noteUpdated () {
+  _setStoreUpdated() {
     const about = this.store.get('store');
     this.store.set('store.last_modified', Date.now())
       .set('store.updates', about.updates + 1)
@@ -147,14 +200,35 @@ class KVStore {
    * @param      {string}   key     The key
    * @return     {boolean}  true if the key exists, otherwise false
    */
-  has (key) {
-    let value;
-    key = this._cleanKey( key);
+  has(key: string): boolean {
+    let value: string | undefined;
+    key = this._cleanKey(key);
     if (key) {
-      value = this.store.get(`store.namespaces.${this.namespace}.${key}`);
+      value = this.store.get(`${NAMESPACES}.${this.namespace}.${key}`);
     }
 
     return typeof value !== 'undefined';
+  }
+
+  /**
+   * is the closest parent of a keypath an object
+   * @param key
+   */
+  _closetObject(key: string): string {
+    let parent_path = key
+    let current: any = undefined
+
+    while (parent_path.length) {
+      current = this.get(parent_path)
+      // debug(`${parent_path}, current ${current}`)
+      if (current) {
+        break
+      }
+      // remove last path item
+      parent_path = parent_path.replace(/\.?\w+$/, "");
+    }
+
+    return parent_path
   }
 
   /**
@@ -162,20 +236,50 @@ class KVStore {
    *
    * @method     put
    * @param      {string}  key     The key
-   * @param      {string}  value   The value
+   * @param      {any}  value   The value
    */
-  put (key, value) {
-    key = this._cleanKey( key);
-    this._lockFile();
+  put(key: string, value: any): any {
+    key = this._cleanKey(key);
 
     if (!key || value === undefined) {
       throw new Error('Error: key field must be specified, as must a value');
     }
-    this.store
-      .set(`store.namespaces.${this.namespace}.${key}`, value)
-      .save(this.indent);
-    this._noteUpdated();
+    // debug(`put key: ${key}`)
+
+    const current: any = this.get(key)
+    if (!current) {
+      const parent: string = this._closetObject(key)
+      // debug(`parent ${parent}`)
+      if (parent.length) {
+        let parent_value: any = this.get(parent)
+        // debug(`parent value ${parent_value}, type ${typeof parent_value}`)
+        if (typeof parent_value !== 'object') {
+          if (this.force) {
+            debug(`force overwriting ${parent} to create path ${key}, due to differnt types`)
+            this.delete(parent)
+          } else {
+            throw new Error(`EBADPATH: cannot overwrite path to ${key} via ${parent}, as parent is different type, use force to overwrite`)
+          }
+        }
+      }
+    } else {
+      // debug('changing type')
+      if (typeof current !== typeof value) {
+        if (this.force) {
+          debug(`force overwriting ${key}, to a new type`)
+          this.delete(key)
+        } else {
+          throw new Error(`EBADTYPE: cannot overwrite ${key}, as different types, use force to overwrite`)
+        }
+      }
+    }
+    const keypath = `${NAMESPACES}.${this.namespace}.${key}`
+    // debug(`storing to ${keypath}`)
+    this._lockFile();
+    this.store.set(keypath, value).save(this.indent);
+    this._setStoreUpdated();
     this._unlockFile();
+
     return this.get(key);
   }
 
@@ -183,93 +287,96 @@ class KVStore {
    * get the stored value from a key
    *
    * @param       {string} key  The key
-   * @return      {string}      The stored value
+   * @return      {any}      The stored value
    */
-  get (key) {
-    let value;
+  get(key: string): any {
+    let value: string = "";
 
-    key = this._cleanKey( key);
+    key = this._cleanKey(key);
     if (key) {
-      value = this.store.get(`store.namespaces.${this.namespace}.${key}`);
+      value = this.store.get(`${NAMESPACES}.${this.namespace}.${key}`);
     }
     return value;
   }
 
-  delete (key) {
-    key = this._cleanKey( key);
-    let preDelete;
+  /**
+   * delete an entry
+   */
+  delete(key: string): string {
+    key = this._cleanKey(key);
+    let preDelete: string = "";
     if (key) {
       preDelete = this.get(key);
       this._lockFile();
       this.store
-        .delete(`store.namespaces.${this.namespace}.${key}`)
+        .delete(`${NAMESPACES}.${this.namespace}.${key}`)
         .save(this.indent);
-      this._noteUpdated();
+      this._setStoreUpdated();
       this._unlockFile();
     }
     return preDelete;
   }
 
   /**
-     * { increment the store value by a given amount }
+     * increment the store value by a given amount
      *
      * @method     incr
      * @param      {string}  key     The key
      * @param      {string}  value   The value
-    * @return     {number}  { the incremeted value }
+     * @return     {number}  { the incremeted value }
      */
-  incr (key, value) {
-    let update = NaN;
+  incr(key: string, value: string): number {
+    let update: number = NaN;
     if (!value) {
       debug('no value to incr with');
-      return;
+      throw new Error('No passed value to incr with');
     }
-    key = this._cleanKey( key);
+    key = this._cleanKey(key);
     if (!key) {
       debug('Error: key field must be specified');
-      return;
+      throw new Error('Missing key field for incr');
     }
 
-    const current = this.get(key) || 0;
+    const current = this.get(key) || "0";
     if (parseInt(value)) {
       update = parseFloat(current) + parseFloat(value);
       if (!isNaN(update) && typeof (update) === 'number') {
         debug(`updating ${key} from ${current} to ${update}`);
-        this.put(key, update);
+        this.put(key, "" + update);
       } else {
         debug('does not calculate to be a number');
       }
     } else {
       debug('incr value is not an integer');
     }
-    return this.get(key);
+    return parseFloat(this.get(key));
   }
 
   /**
-    * { decrement the store value by a given amount }
+    * decrement the store value by a given amount
     *
     * @method     decr
     * @param      {string}  key     The key
     * @param      {string}  value   The value
     * @return     {number}  { the decremeted value }
     */
-  decr (key, value) {
-    let update = NaN;
+  decr(key: string, value: string): number {
+    let update: number = NaN;
     if (!value) {
       debug('no value to decr with');
-      return;
+      throw new Error('No passed value to decr with');
     }
-    key = this._cleanKey( key);
+    key = this._cleanKey(key);
     if (!key) {
       debug('Error: key field must be specified');
-      return;
+      throw new Error('Missing key field');
     }
     if (parseInt(value)) {
-      const current = this.get(key) || 0;
+      const current = this.get(key) || "0";
       update = parseInt(current) - parseInt(value);
       if (!isNaN(update) && typeof (update) === 'number') {
         debug(`updating ${key} from ${current} to ${update}`);
-        this.put(key, update);
+        this.put(key, "" + update);
       } else {
         debug('does not calculate to be a number');
       }
@@ -277,19 +384,21 @@ class KVStore {
       debug('decr value is not an integer');
     }
 
-    return this.get(key);
+    return parseFloat(this.get(key));
   }
 
-  //
-  // add the value to the end of the array, if the current content of the key is
-  // not an array then it will be converted to one
-  //
-  // @method     push
-  // @param      {string}  key     The key
-  // @param      {any}  value   The value
-  //
-  push (key, value) {
-    let current = this.get(key);
+  /**
+   * add the value to the end of the array, if the current content of the key is
+   * not an array then it will be converted to one
+   *
+   * @method     push
+   * @param      {string}  key     The key
+   * @param      {any}  value   The value
+   *
+   *
+  */
+  push(key: string, value: any) {
+    let current: any = this.get(key);
 
     if (!current) {
       current = [value];
@@ -303,17 +412,19 @@ class KVStore {
     this.put(key, current);
   }
 
-  //
-  // take the last value from the array, if the current content of the key is
-  // not an array then that value will be used
-  //
-  // @method     pop
-  // @param      {string}  key     The key
-  // @return     {any}   the value at the end of the array indexed by key
-  //
-  pop (key) {
-    const current = this.get(key);
-    let value;
+  /**
+   *
+   * take the last value from the array, if the current content of the key is
+   * not an array then that value will be used
+   *
+   * @method     pop
+   * @param      {string}  key     The key
+   * @return     {any}   the value at the end of the array indexed by key
+   *
+  */
+  pop(key: string): any {
+    const current: any = this.get(key);
+    let value: any;
 
     if (current) {
       if (Array.isArray(current)) {
@@ -329,16 +440,16 @@ class KVStore {
     return value;
   }
 
-  //
-  // add the value to the start of the array, if the current content of the key
-  // is not an array then it will be converted to one
-  //
-  // @method     unshift
-  // @param      {string}  key     The key
-  // @param      {any}  value   The value
-  //
-  unshift (key, value) {
-    let current = this.get(key);
+  /**
+   *  add the value to the start of the array, if the current content of the key
+   *  is not an array then it will be converted to one
+   *
+   *  @method     unshift
+   *  @param      {string}  key     The key
+   *  @param      {any}  value   The value
+   */
+  unshift(key: string, value: any) {
+    let current: any = this.get(key);
 
     if (current) {
       if (Array.isArray(current)) {
@@ -351,17 +462,17 @@ class KVStore {
     }
   }
 
-  //
-  // take the first value from the array, if the current content of the key is
-  // not an array then that value will be used
-  //
-  // @method     shift
-  // @param      {string}  key     The key
-  // @return     {any}  the value at the start of the array indexed by key
-  //
-  shift (key) {
-    let current = this.get(key);
-    let value;
+  /**
+   * take the first value from the array, if the current content of the key is
+   * not an array then that value will be used
+   *
+   * @method     shift
+   * @param      {string}  key     The key
+   * @return     {any}  the value at the start of the array indexed by key
+  */
+  shift(key: string): any {
+    let current: any = this.get(key);
+    let value: any;
 
     if (!current) {
       current = NaN;
@@ -379,20 +490,19 @@ class KVStore {
     return value;
   }
 
-  //
-  // limit the size of an array field, if the current content of the key is
-  // not an array nothing happens
-  //
-  // @method     limit
-  // @param      {string}  key     The key
-  // @param      {string}  direction    head or tail, the front or the end of the array
-  // @param      {string}  count   The number of items to limit the array to
-
-  // @return     {number}  the size of the ammended array
-  //
-  limit (key, direction, count) {
-    const current = this.get(key);
-    let value = 0;
+  /**
+  * limit the size of an array field, if the current content of the key is
+  * not an array nothing happens
+  *
+  * @method     limit
+  * @param      {string}  key     The key
+  * @param      {string}  direction    head or tail, the front or the end of the array
+  * @param      {number}  count   The number of items to limit the array to
+  * @return     {number}  the size of the ammended array
+  */
+  limit(key: string, direction: string, count: number): number {
+    const current: any = this.get(key);
+    let value: number = 0;
 
     if (count < 0) {
       throw new Error('Error: KV limit cannot use a -ve value');
@@ -402,12 +512,12 @@ class KVStore {
       switch (direction) {
         case 'head':
         case 'front':
-            current.length = count;
+          current.length = count;
           this.put(key, current);
           break;
         case 'tail':
         case 'end':
-            this.put(key, current.slice(-1 * count));
+          this.put(key, current.slice(-1 * count));
           break;
         default:
           debug(`limit: incorrect direction '${direction} used`);
@@ -419,14 +529,14 @@ class KVStore {
   }
 
   /**
-    * { get all the values for keys that are like the given key }
+    * get all the values for keys that are like the given key
     *
     * @method     find
-    * @param      {string}  regexp  The regular expression as a string
+    * @param      {RegExp}   The regular expression as a string
     * @return     {Array}   { array of matches }
     */
-  find (regexp) {
-    const resp = [];
+  find(regexp: RegExp): Array<any> {
+    const resp: Array<any> = [];
     if (typeof regexp === 'string') {
       // turn it into a proper regexp
       regexp = new RegExp(regexp, 'i');
@@ -436,13 +546,13 @@ class KVStore {
       return resp;
     }
     try {
-      const list = this.store.get(`store.namespaces.${this.namespace}`);
+      const list = this.store.get(`${NAMESPACES}.${this.namespace}`);
 
-      const a = flatten(list);
-      Object.keys(a).sort().forEach((key) => {
+      const a: { [index: string]: any } = flatten(list);
+      Object.keys(a).sort().forEach((key: string) => {
         if (key.match(regexp)) {
-        // console.log( {key})
-          const b = {};
+          // console.log( {key})
+          const b: { [index: string]: any } = {};
           b[key] = a[key];
           resp.push(unflatten(b));
         }
@@ -459,10 +569,10 @@ class KVStore {
   // @method     list
   // @return     {string[]}  { description_of_the_return_value }
   //
-  list () {
-    const resp = [];
+  list(): Array<any> {
+    const resp: Array<any> = [];
     try {
-      const list = this.store.get(`store.namespaces.${this.namespace}`);
+      const list = this.store.get(`${NAMESPACES}.${this.namespace}`);
       Object.keys(list).sort().forEach((key) => {
         resp.push({ [key]: list[key] }); // need to evaluate the key to use it like this
       });
@@ -478,11 +588,11 @@ class KVStore {
   // @method     keys
   // @return     {string[]}  { description_of_the_return_value }
   //
-  keys () {
-    const resp = [];
+  keys() {
+    const resp: Array<any> = [];
 
     try {
-      const list = this.store.get(`store.namespaces.${this.namespace}`);
+      const list = this.store.get(`${NAMESPACES}.${this.namespace}`);
       Object.keys(list).sort().forEach((key) => {
         resp.push(key);
       });
@@ -493,11 +603,11 @@ class KVStore {
   }
 
   // list just the values associated with the namespace
-  values () {
-    const resp = [];
+  values() {
+    const resp: Array<any> = [];
 
     try {
-      const list = this.store.get(`store.namespaces.${this.namespace}`);
+      const list = this.store.get(`${NAMESPACES}.${this.namespace}`);
       Object.keys(list).sort().forEach((key) => {
         resp.push(list[key]);
       });
@@ -513,8 +623,8 @@ class KVStore {
    * @method     getAll
    * @return     {object}  All of the data in the namespace
    */
-  getAll () {
-    return this.store.get(`store.namespaces.${this.namespace}`);
+  getAll(): any {
+    return this.store.get(`${NAMESPACES}.${this.namespace}`);
   }
 
   /**
@@ -523,7 +633,7 @@ class KVStore {
    * @method     export
    * @return     {object}  All of the data in the namespace
    */
-  export () {
+  export(): object {
     return this.getAll()
   }
 
@@ -531,9 +641,9 @@ class KVStore {
    * get info about the store as a whole
    *
    * @method     info
-   * @return     {object}  The about object
+   * @return     {any}  The about object
    */
-  info () {
+  info(): any {
     const about = this.store.get('store');
     const d = new Date(about.last_modified);
     about.last_modified = d.toISOString();
@@ -547,15 +657,13 @@ class KVStore {
    *
    * @method     destroy
    */
-  destroy () {
+  destroy() {
     const about = this.store.get('store');
     this._lockFile();
-    this.store.delete(`store.namespaces.${this.namespace}`)
+    this.store.delete(`${NAMESPACES}.${this.namespace}`)
       .set('store.last_modified', Date.now())
       .set('store.updates', about.updates + 1)
       .save(this.indent);
     this._unlockFile();
   }
 }
-
-module.exports = KVStore;

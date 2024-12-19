@@ -1,5 +1,3 @@
-ls# kv
-
 **updated:2024-12-03 check building and installing instructions, as now using [deno](https://deno.com/)**
 
 I initially created this repo to allow CLI apps to access simple key-value stores. It has now grown beyond that. It now provides access to data within a JSON file, performing basic get/put operations, operations on numbers such as incr and decr, operations on arrays (e.g. push, pop, shift, unshift), as well as providing search functionality.

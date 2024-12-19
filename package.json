@@ -1,6 +1,6 @@
 {
   "name": "kvstore",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Simple Key-Value store with namespaces for simple apps to use",
   "type": "commonjs",
   "author": "Kevin Mulholland",

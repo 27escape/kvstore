@@ -1,3 +1,21 @@
+## 3.0.0 (2024-12-19)
+
+* 3.0.0 ([0965777](https://github.com/27escape/kvstore/commit/0965777))
+* Update README.md ([078ae68](https://github.com/27escape/kvstore/commit/078ae68))
+* chore: ignore dev file ([20de1a7](https://github.com/27escape/kvstore/commit/20de1a7))
+* chore: stop using log function, use console.log ([cb98aaa](https://github.com/27escape/kvstore/commit/cb98aaa))
+* docs: remove spurious characters ([cb99e43](https://github.com/27escape/kvstore/commit/cb99e43))
+* fix: tests had been failing due to prevous changes ([54f01bc](https://github.com/27escape/kvstore/commit/54f01bc))
+* feat: upgrading to deno/typescript ([cf2b81c](https://github.com/27escape/kvstore/commit/cf2b81c))
+
+
+
+## 1.3.0 (2024-03-04)
+
+* release: updating changelogs for 1.3.0 ([5892845](https://github.com/27escape/kvstore/commit/5892845))
+
+
+
 ## 1.3.0 (2024-03-04)
 
 * --wip-- [skip ci] ([6cba89d](https://github.com/27escape/kvstore/commit/6cba89d))

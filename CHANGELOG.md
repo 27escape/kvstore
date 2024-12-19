@@ -1,3 +1,21 @@
+# [3.0.0](https://github.com/27escape/kvstore/compare/1.3.0...v3.0.0) (2024-12-19)
+
+
+### Bug Fixes
+
+* tests had been failing due to prevous changes ([54f01bc](https://github.com/27escape/kvstore/commit/54f01bc96590c17200e666c74de625e462c0574c))
+
+
+### Features
+
+* upgrading to deno/typescript ([cf2b81c](https://github.com/27escape/kvstore/commit/cf2b81cc7a42c3a3eb70fb6be4b8060baa7e931f))
+
+
+
+# [1.3.0](https://github.com/27escape/kvstore/compare/v1.3.0...1.3.0) (2024-03-04)
+
+
+
 # [1.3.0](https://github.com/27escape/kvstore/compare/1.2.0...v1.3.0) (2024-03-04)
 
 

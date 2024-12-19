@@ -18,7 +18,6 @@ const KV_VERSION = '2.1.0';
 import * as path from 'path'
 import * as fs from 'fs'
 import Debug from 'debug';
-// const LIBNAME = path.basename(import.meta.filename.replace(/\.ts$/, ''));
 const LIBNAME = 'kvstore'
 const debug = Debug(LIBNAME);
 
@@ -40,13 +39,15 @@ export class KVStore {
   lockFileName: string;
   tidykeys: boolean;
 
-  constructor(config: { filename: string, namespace: string, indent: number, tidykeys: boolean, force: boolean }) {
+  constructor(config: { filename: string, namespace: string, indent?: number, tidykeys?: boolean, force?: boolean }) {
 
     if (config.indent === undefined) {
       config.indent = 2
     }
-    this.force = config.force;
-    this.indent = config.indent;
+    // default force true, allow people to shoot their feet
+    this.force = config.force ? config.force : true ;
+    this.indent = config.indent ? config.indent : 2;
+
     if (!config.namespace) {
       debug('Missing namespace, using defaut');
       this.namespace = 'default';
@@ -55,18 +56,14 @@ export class KVStore {
     }
     this.lockFileName = path.join(`${config.filename}.lock`);
     this.filename = config.filename;
-    this.tidykeys = config.tidykeys;
+    this.tidykeys = config.tidykeys ? config.tidykeys : false ;
 
     try {
-      // const fileid = hashsum(filename);
-      // this.lockFileName = path.join(os.tmpdir(), `${filename}.${fileid}.lock`);
-      // debug(this.lockfileName);
-      this._lockFile();
-
       this.store = new DotJson(this.filename);
 
       if (!this._isFile(this.filename)) {
         debug('creating the KV store file');
+        this._lockFile();
         // create the KV file the first time around
         this.store
           .set('store.version', KV_VERSION)
@@ -76,11 +73,11 @@ export class KVStore {
           .set(`${NAMESPACES}`, {})
           .save(this.indent);
       }
+      this._unlockFile();
       const about = this.store.get('store');
       if (!about) {
         throw new Error(`Error: KV store file ${this.filename} is invalid`);
       }
-      this._unlockFile();
     } catch (err) {
       this._unlockFile();
       // error(err);
@@ -220,7 +217,6 @@ export class KVStore {
 
     while (parent_path.length) {
       current = this.get(parent_path)
-      // debug(`${parent_path}, current ${current}`)
       if (current) {
         break
       }
@@ -244,15 +240,11 @@ export class KVStore {
     if (!key || value === undefined) {
       throw new Error('Error: key field must be specified, as must a value');
     }
-    // debug(`put key: ${key}`)
-
     const current: any = this.get(key)
     if (!current) {
       const parent: string = this._closetObject(key)
-      // debug(`parent ${parent}`)
       if (parent.length) {
         let parent_value: any = this.get(parent)
-        // debug(`parent value ${parent_value}, type ${typeof parent_value}`)
         if (typeof parent_value !== 'object') {
           if (this.force) {
             debug(`force overwriting ${parent} to create path ${key}, due to differnt types`)
@@ -263,7 +255,6 @@ export class KVStore {
         }
       }
     } else {
-      // debug('changing type')
       if (typeof current !== typeof value) {
         if (this.force) {
           debug(`force overwriting ${key}, to a new type`)
@@ -274,7 +265,6 @@ export class KVStore {
       }
     }
     const keypath = `${NAMESPACES}.${this.namespace}.${key}`
-    // debug(`storing to ${keypath}`)
     this._lockFile();
     this.store.set(keypath, value).save(this.indent);
     this._setStoreUpdated();
@@ -290,7 +280,7 @@ export class KVStore {
    * @return      {any}      The stored value
    */
   get(key: string): any {
-    let value: string = "";
+    let value:string = "";
 
     key = this._cleanKey(key);
     if (key) {
@@ -322,34 +312,36 @@ export class KVStore {
      *
      * @method     incr
      * @param      {string}  key     The key
-     * @param      {string}  value   The value
+     * @param      {string|number}  value   The value
      * @return     {number}  { the incremeted value }
      */
-  incr(key: string, value: string): number {
+  incr(key: string, value?: number|string): number {
     let update: number = NaN;
     if (!value) {
-      debug('no value to incr with');
-      throw new Error('No passed value to incr with');
+      debug('no value to incr with, assume 1');
+      value = 1
     }
+    const incrValue:number = typeof value == "string" ? parseInt(value) : value;
+
     key = this._cleanKey(key);
     if (!key) {
       debug('Error: key field must be specified');
       throw new Error('Missing key field for incr');
     }
 
-    const current = this.get(key) || "0";
-    if (parseInt(value)) {
-      update = parseFloat(current) + parseFloat(value);
+    if (!isNaN(incrValue)) {
+      const current = this.get(key) || 0;
+      update = parseFloat(current) + incrValue;
       if (!isNaN(update) && typeof (update) === 'number') {
         debug(`updating ${key} from ${current} to ${update}`);
-        this.put(key, "" + update);
+        this.put(key, update);
       } else {
         debug('does not calculate to be a number');
       }
     } else {
       debug('incr value is not an integer');
     }
-    return parseFloat(this.get(key));
+    return this.get(key);
   }
 
   /**
@@ -357,34 +349,35 @@ export class KVStore {
     *
     * @method     decr
     * @param      {string}  key     The key
-    * @param      {string}  value   The value
+    * @param      {string|number}  value   The value
     * @return     {number}  { the decremeted value }
     */
-  decr(key: string, value: string): number {
+  decr(key: string, value?: string|number): number {
     let update: number = NaN;
     if (!value) {
-      debug('no value to decr with');
-      throw new Error('No passed value to decr with');
+      debug('no value to decr with, assume 1');
+      value = 1
     }
+    const decrValue:number = typeof value == "string" ? parseInt(value) : value;
     key = this._cleanKey(key);
     if (!key) {
       debug('Error: key field must be specified');
       throw new Error('Missing key field');
     }
-    if (parseInt(value)) {
+    if (!isNaN(decrValue)) {
       const current = this.get(key) || "0";
-      update = parseInt(current) - parseInt(value);
+      update = parseInt(current) - decrValue;
       if (!isNaN(update) && typeof (update) === 'number') {
         debug(`updating ${key} from ${current} to ${update}`);
-        this.put(key, "" + update);
+        this.put(key, update);
       } else {
         debug('does not calculate to be a number');
       }
     } else {
-      debug('decr value is not an integer');
+      debug('decr value is not an integer', decrValue);
     }
 
-    return parseFloat(this.get(key));
+    return this.get(key);
   }
 
   /**
@@ -551,7 +544,6 @@ export class KVStore {
       const a: { [index: string]: any } = flatten(list);
       Object.keys(a).sort().forEach((key: string) => {
         if (key.match(regexp)) {
-          // console.log( {key})
           const b: { [index: string]: any } = {};
           b[key] = a[key];
           resp.push(unflatten(b));

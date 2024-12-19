@@ -19,6 +19,7 @@ const VERSION = '2.1.0';
 
 import * as path from 'node:path'
 import * as os from 'node:os'
+import process from "node:process";
 const PROGRAM = path.basename(process.argv[1]).replace(/\.ts$/, '');
 
 import Debug from 'debug';
@@ -32,9 +33,7 @@ const STORE_FILE = process.env.KV_STORE_FILE || DEFAULT_STORE;
 
 import '../lib/basic-sprintf.js';
 
-// const KVStore = require('../lib/kvstore');
 import { KVStore } from '../lib/kvstore.ts';
-
 
 // -----------------------------------------------------------------------------
 

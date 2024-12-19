@@ -1,4 +1,6 @@
-# kv
+ls# kv
+
+**updated:2024-12-03 check building and installing instructions, as now using [deno](https://deno.com/)**
 
 I initially created this repo to allow CLI apps to access simple key-value stores. It has now grown beyond that. It now provides access to data within a JSON file, performing basic get/put operations, operations on numbers such as incr and decr, operations on arrays (e.g. push, pop, shift, unshift), as well as providing search functionality.
 
@@ -10,19 +12,29 @@ Due to the use of a local file to hold the data, this library is not suitable fo
 
 This repo provides both a library for use by nodejs scripts and a CLI (kv) to either be used standalone or within bash scripts.
 
-## Installing
+## Building and Installing
 
-If you have cloned this repo, then `npm install` should do the trick, if you want to use the `kv` script for CLI, then you need to run `npm link`
+First up head to https://deno.com/ to find out how to install deno for your system
 
-You may run `npm run test` to make sure everything is working as expected.
+I have a simple bash script that will compile a deno script only if it has changed against a previously compiled version, its in `extras/deno_compile.sh`, copy it and make sure its executable in your PATH - likely not to work on Windows!
 
-I have not yet added this to [NPM](https://www.npmjs.com/)
+```
+deno task build
+```
+
+This creates a `kv` executable for your system in the 'dist' directory, after it has been tested
+
+```
+deno task install
+```
+
+Will build and install to `$HOME/bin/kv`
 
 ## As a library
 
 ```js
-// until I release it to npm, you will have to reference it with a full path
-const KVStore = require('../kvstore/lib/kvstore');
+// until I release it to wherever, you will have to reference it with a full path
+import { KVStore } from '../lib/kvstore.ts';
 
 const kv = new KVStore({ filename: '/tmp/kvstore.json', namespace: 'sample' });
 
@@ -57,7 +69,3 @@ $ kv --ns 'namespace' /tmp/sample.js delete key1
 
 For more operations see [CLI documentation](cli.md) or use the inbuilt help  `kv -h`
 
-
-## Use with bun
-
-If you want to make use of this script with [bun](https://bun.sh/) then replace `node` with `bun` in `bin/kv`, you will of course need `bun` to be installed on your system.

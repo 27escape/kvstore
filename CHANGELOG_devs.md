@@ -1,3 +1,10 @@
+## 4.0.0 (2024-12-19)
+
+* 4.0.0 ([3e9d1d1](https://github.com/27escape/kvstore/commit/3e9d1d1))
+* release: updating changelogs for ([068cb7b](https://github.com/27escape/kvstore/commit/068cb7b))
+
+
+
 ## 3.0.0 (2024-12-19)
 
 * 3.0.0 ([0965777](https://github.com/27escape/kvstore/commit/0965777))

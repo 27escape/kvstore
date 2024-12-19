@@ -1,0 +1,61 @@
+{
+  "imports": {
+    "path": "node:path",
+    "fs": "node:fs",
+    "os": "node:os",
+    "flat": "npm:flat",
+    "lockfile": "npm:lockfile",
+    "underscore-keypath": "npm:underscore-keypath",
+    "detect-indent": "npm:detect-indent",
+    "dot-json": "npm:dot-json"
+  },
+
+  "compilerOptions": {
+    "lib": ["deno.window",  "deno.ns",  "deno.unstable"],
+    "strict": true
+  },
+
+  "include": ["./", "./bin", "./lib"],
+  "exclude": [ "./dist", "./off"],
+
+  "nodeModulesDir": "none",
+
+  "unstable": ["cron", "kv", "webgpu"],
+
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["ban-untagged-todo"],
+      "exclude": ["no-unused-vars"]
+    }
+  },
+
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 120,
+    "indentWidth": 4,
+    "semiColons": true,
+    "singleQuote": true,
+    "proseWrap": "preserve"
+  },
+
+  "tasks": {
+    "test": {
+      "command": "echo 'run tests' && deno test -A --unstable-detect-cjs lib/kvstore.test.ts"
+    },
+    "clean": {
+      "command": "echo cleaning && rm -rf dist"
+    },
+    "build": {
+      "description": "build for the current platform target",
+      "command": "deno_compile.sh ./bin/kv.ts",
+      "dependencies": [ "clean", "test"]
+    },
+    "install": {
+      "description": "install built script to users bin dir",
+      "command": "cp dist/kv $HOME/bin",
+      "dependencies": ["build"]
+    }
+  }
+
+}

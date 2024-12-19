@@ -3,7 +3,7 @@
 
 ```js
 
-const KVStore = require('../kvstore/lib/kvstore');
+import { KVStore } from '../lib/kvstore.ts';
 
 const kv = new KVStore({ filename: '/tmp/kvstore.json', namespace: 'sample' });
 
